@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Aravindh V - Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <style>
+  /* GOOGLE FONT */
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+  /* RESET */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { 
+    font-family: 'Nunito', sans-serif; 
+    background: linear-gradient(135deg, #fdfbfb, #ebedee);
+    color: #222; line-height: 1.7;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(90deg, #6a11cb, #2575fc);
+    color: #fff;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+  header h1 { font-size: 1.5rem; font-weight: 700; }
+  nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 14px;
+    font-weight: 600;
+    transition: 0.3s ease;
+  }
+  nav a:hover { color: #ffe53b; text-shadow: 0 0 8px #fff; }
+
+  /* SECTIONS */
+  section {
+    padding: 70px 25px;
+    max-width: 1000px;
+    margin: 50px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    animation: fadeIn 1s ease;
+  }
+  section h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 2rem;
+  font-weight: 700;
+
+  /* Gradient text */
+  background: linear-gradient(45deg, #ff512f, #dd2476);
+  background-clip: text;              /* Standard */
+  -webkit-background-clip: text;      /* For Chrome, Safari */
+  color: transparent;                 /* Fallback */
+  -webkit-text-fill-color: transparent; /* Makes gradient visible */
+}
+
+  /* HOME */
+  #home { text-align: center; }
+  #home h2 { font-size: 2.3rem; margin-bottom: 15px; color: #6a11cb; }
+  #home p { font-size: 1.1rem; }
+
+  /* ABOUT */
+  #about {
+  text-align: center;
+  padding: 80px;
+}
+
+#about .about-img {
+  width: 140px;   /* smaller size */
+  height: 140px;
+  margin: 20px auto;   /* centers inside section */
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #2575fc;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+#about .about-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  /* keeps image neat inside circle */
+  display: block;
+}
+
+  #about p { margin-top: 20px; font-size: 1.05rem; }
+  .btn-sci { margin-top: 25px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+  .btn {
+    padding: 12px 22px;
+    background: linear-gradient(45deg, #ff512f, #f09819);
+    color: #fff; border-radius: 8px;
+    text-decoration: none; font-weight: 600;
+    transition: 0.3s ease;
+  }
+  .btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+  .sci a { font-size: 30px; color: #6a11cb; transition: 0.3s; }
+  .sci a:hover { color: #f09819; transform: rotate(8deg) scale(1.1); }
+
+  /* PROJECTS */
+  #projects p { text-align: center; margin-bottom: 15px; }
+  #projects ul { list-style: none; padding: 0; }
+  #projects li {
+    background: linear-gradient(135deg, #89f7fe, #66a6ff);
+    color: #fff;
+    margin: 12px auto; padding: 15px 20px;
+    border-radius: 12px; max-width: 650px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-size: 1.05rem; font-weight: 600;
+    transition: 0.3s ease;
+  }
+  #projects li:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+  }
+  #projects a { text-decoration: none; color: #fff; }
+
+  /* CERTIFICATES */
+  #certificates .certificates-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px; margin-top: 25px;
+  }
+  .certificate-card {
+    background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    padding: 15px; border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+    transition: 0.3s;
+    text-align: center;
+  }
+  .certificate-card:hover { transform: translateY(-6px) rotate(-1deg); }
+  .certificate-card img { max-width: 100%; border-radius: 8px; }
+
+  /* Lightbox */
+  #lightbox {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+  }
+  #lightbox img {
+    max-width: 80%; max-height: 80%;
+    border-radius: 12px;
+    animation: zoomIn 0.4s ease;
+  }
+  #lightbox #close {
+    position: absolute; top: 20px; right: 40px;
+    color: #fff; font-size: 40px; font-weight: bold;
+    cursor: pointer;
+  }
+  #close:hover { color: #f09819; }
+  #prev, #next {
+    cursor: pointer;
+    position: absolute; top: 50%;
+    font-size: 50px; color: white;
+    font-weight: bold; user-select: none;
+    transition: 0.3s;
+  }
+  #prev:hover, #next:hover { color: #ff512f; }
+  #prev { left: 50px; } #next { right: 50px; }
+
+  /* CONTACT */
+  #contact { text-align: center; }
+  .contact-info {
+    display: inline-block;
+    text-align: left;
+    margin-top: 20px;
+    padding: 20px 30px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #c9ffbf, #ffafbd);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  #contact p { margin: 8px 0; font-size: 1.1rem; color: #222; }
+  #contact a { color: #6a11cb; font-weight: 600; text-decoration: none; }
+  #contact a:hover { color: #ff512f; }
+
+  /* FOOTER */
+  footer {
+    text-align: center; padding: 20px;
+    background: linear-gradient(90deg, #6a11cb, #2575fc);
+    color: #fff; margin-top: 50px;
+    font-size: 0.95rem;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(20px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+  @keyframes zoomIn {
+    from {transform: scale(0.8);}
+    to {transform: scale(1);}
+  }
+</style>
+
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <h1>Aravindh</h1>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#certificates">Certificates</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <!-- HOME -->
+  <section id="home">
+    <h2>Welcome to My Portfolio</h2>
+    <p>Hello, I'm <strong>Aravindh V</strong>.  
+       Explore my projects, know more about me, check my certificates, and feel free to connect!</p><br>
+      <em> <p>Believe in your potential, take action, and turn your ideas into reality</p></em>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <h2>About Me</h2>
+    <div class="about-img">
+      <img src="aravindh bg remove.png" alt="My Photo">
+    </div>
+    <p>
+      Hi, I’m <strong>Aravindh V</strong>, a B.Sc. Computer Science (AI & ML) 2nd-year student at  
+      <strong>Takshashila University (FACE Prep Campus)</strong>. I’m passionate about AI, ML, and web development, and I enjoy building practical tech solutions. <br><br>
+
+      <strong>Skills:</strong><br>
+      Programming: Python, Java (basics) <br>
+      Web: HTML, CSS, JavaScript <br>
+      AI/ML: Fundamentals (learning) <br>
+      Tools: GitHub, VS Code <br><br>
+
+      <strong>Projects:</strong><br>
+      Personal Finance Assistant (AI-powered) – HTML/CSS/JS <br>
+      Portfolio Website – Responsive site to showcase my work <br>
+      Python Mini Projects – Coding practice with problem-solving focus
+    </p>
+    <div class="btn-sci">
+      <a href="#" class="btn">Download CV</a>
+      <div class="sci">
+        <a href="https://github.com/aravindhvinayagam2007-crypto" target="_blank">
+          <i class="bx bxl-github"></i>
+        </a>
+        <a href="https://www.linkedin.com/in/aravindh-v2727" target="_blank">
+          <i class="bx bxl-linkedin"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <h2>My Projects</h2>
+    <p>Click The link To See My Projects.</p>
+    <ul>
+      <li>🚀 <a href="fin.html" target="_blank">Personal Finance Assistant (AI-powered web app)</a></li>
+      <li>🌌 <a href="space.html" target="_blank"> Space Media Portfolio Website</li></a>
+      <li>📊  <a href="d v d.html" target="_blank">Data Visualization Dashboard (Python & JavaScript)</a> </li>
+      <li>💡 <a href="quiz.html" target="_blank">Interactive Quiz Application</li></a> 
+    </ul>
+  </section>
+
+  <!-- CERTIFICATES -->
+  <section id="certificates">
+    <h2>My Certificates</h2>
+    <div class="certificates-grid">
+      <div class="certificate-card">
+        <img src="certificate-1.jpg" alt="Certificate 1" class="cert-img">
+        <p><strong>Software Engineering</strong> – Coursera</p>
+      </div>
+      <div class="certificate-card">
+        <img src="certificate-2.jpg" alt="Certificate 2" class="cert-img">
+        <p><strong>XF Conclave</strong> – Xebia Academy</p>
+      </div>
+      <div class="certificate-card">
+        <img src="certificate-3.jpg" alt="Certificate 3" class="cert-img">
+        <p><strong>AI & ML Workshop</strong> – Takshashila University</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div id="lightbox">
+    <span id="close">&times;</span>
+    <span id="prev">&#10094;</span>
+    <img id="lightbox-img" src="">
+    <span id="next">&#10095;</span>
+  </div>
+
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <h2>Contact Me</h2>
+    <div class="contact-info">
+    <p><strong>Name:</strong> Aravindh V</p>
+    <p><strong>Email:</strong> aravindhvinayagam2007@gmail.com</p>
+    <p><strong>Phone:</strong> +91 9342695097</p>
+    <p><strong>GitHub:</strong> <a href="https://github.com/aravindhvinayagam2007-crypto" target="_blank">aravindhvinayagam2007-crypto</a></p>
+    <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/aravindh-v2727" target="_blank">www.linkedin.com/in/aravindh-v2727</a></p>
+  <p><strong>Address:</strong> 62, Keezhmada Veethi, Dhadapuram, Tindivanam, Pin Code: 604207</p></div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Aravindh V | Dream • Code • Create ✨</p>
+  </footer>
+
+  <!-- SCRIPT -->
+  <script>
+    // Navigation
+    const links = document.querySelectorAll("nav a");
+    const sections = document.querySelectorAll("section");
+
+    links.forEach(link => {
+      link.addEventListener("click", () => {
+        links.forEach(l => l.classList.remove("active"));
+        sections.forEach(s => s.classList.remove("active"));
+        link.classList.add("active");
+        document.getElementById(link.dataset.target).classList.add("active");
+      });
+    });
+
+    // Lightbox Gallery
+    const certImages = document.querySelectorAll(".cert-img");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+    const closeBtn = document.getElementById("close");
+    const prevBtn = document.getElementById("prev");
+    const nextBtn = document.getElementById("next");
+
+    let currentIndex = 0;
+
+    certImages.forEach((img, index) => {
+      img.addEventListener("click", () => {
+        currentIndex = index;
+        showImage(currentIndex);
+        lightbox.style.display = "flex";
+      });
+    });
+
+    function showImage(index) {
+      lightboxImg.src = certImages[index].src;
+    }
+
+    nextBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex + 1) % certImages.length;
+      showImage(currentIndex);
+    });
+
+    prevBtn.addEventListener("click", () => {
+      currentIndex = (currentIndex - 1 + certImages.length) % certImages.length;
+      showImage(currentIndex);
+    });
+
+    closeBtn.addEventListener("click", () => {
+      lightbox.style.display = "none";
+    });
+
+    lightbox.addEventListener("click", (e) => {
+      if (e.target === lightbox) {
+        lightbox.style.display = "none";
+      }
+    });
+  </script>
+
+</body>
+</html>

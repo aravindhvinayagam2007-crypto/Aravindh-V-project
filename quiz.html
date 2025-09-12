@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Quiz Application</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* ==== BODY ==== */
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #667eea, #764ba2, #ee0979);
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+
+/* Background animation */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==== QUIZ BOX ==== */
+.quiz-container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 35px;
+  border-radius: 20px;
+  width: 450px;
+  text-align: center;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.4), 0 0 50px rgba(255, 255, 255, 0.1);
+  animation: fadeIn 1.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+h1 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #ffe53b;
+  text-shadow: 0 0 10px #ff416c, 0 0 20px #ff4b2b;
+}
+
+/* ==== QUESTIONS ==== */
+.question {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+/* ==== OPTIONS ==== */
+.options {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.options li {
+  margin: 12px 0;
+}
+
+.options button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.options button:hover {
+  transform: scale(1.08);
+  background: linear-gradient(135deg, #ff6a00, #ee0979);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.7);
+}
+
+/* ==== NEXT BUTTON ==== */
+#next-btn {
+  margin-top: 20px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #43e97b, #38f9d7);
+  color: #000;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  display: none;
+  transition: all 0.3s;
+}
+
+#next-btn:hover {
+  transform: scale(1.1) rotate(-2deg);
+  background: linear-gradient(135deg, #ff4b2b, #ff416c);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+}
+
+/* ==== RESULT ==== */
+#result {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-top: 20px;
+  color: #ffe53b;
+  text-shadow: 0 0 10px lch(86.67% 1.54 359.34), 0 0 20px #76e998;
+}
+
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <h1>Interactive Quiz</h1>
+    <div id="quiz">
+      <div class="question" id="question">Question text</div>
+      <ul class="options" id="options"></ul>
+      <button id="next-btn">Next</button>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    const allQuestions = [
+      
+  {
+    question: "Which of the following is NOT a programming language?",
+    options: ["Python", "Java", "HTML", "C++"],
+    answer: "HTML"
+  },
+  {
+    question: "What does CSS stand for?",
+    options: [
+      "Cascading Style Sheets",
+      "Computer Styled Sections",
+      "Creative Style System",
+      "Colorful Style Sheets"
+    ],
+    answer: "Cascading Style Sheets"
+  },
+  {
+    question: "Which data structure uses FIFO (First In, First Out)?",
+    options: ["Stack", "Queue", "Array", "Tree"],
+    answer: "Queue"
+  },
+  {
+    question: "Which SQL command is used to remove all records from a table?",
+    options: ["DELETE", "REMOVE", "DROP", "TRUNCATE"],
+    answer: "TRUNCATE"
+  },
+  {
+    question: "Which company developed the Java programming language?",
+    options: ["Oracle", "Sun Microsystems", "Microsoft", "IBM"],
+    answer: "Sun Microsystems"
+  },
+  {
+    question: "Which keyword is used to define a function in Python?",
+    options: ["function", "def", "fun", "lambda"],
+    answer: "def"
+  },
+  {
+    question: "Which HTML tag is used to create a hyperlink?",
+    options: ["<a>", "<link>", "<href>", "<url>"],
+    answer: "<a>"
+  },
+  {
+    question: "Which of the following is an example of supervised learning?",
+    options: ["Clustering", "Classification", "Dimensionality Reduction", "Anomaly Detection"],
+    answer: "Classification"
+  },
+  {
+    question: "Which is the default port number for MySQL?",
+    options: ["1521", "3306", "8080", "1433"],
+    answer: "3306"
+  },
+  {
+    question: "In Machine Learning, what does 'overfitting' mean?",
+    options: [
+      "Model performs well on training but poorly on new data",
+      "Model performs well on both training and test data",
+      "Model ignores training data completely",
+      "Model is too simple"
+    ],
+    answer: "Model performs well on training but poorly on new data"
+  }
+];
+
+
+    // Shuffle and pick 15
+    const quizData = allQuestions.sort(() => 0.5 - Math.random());
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const resultEl = document.getElementById("result");
+
+    let current = 0, score = 0;
+
+    function loadQuestion() {
+      resultEl.textContent = "";
+      nextBtn.style.display = "none";
+      const q = quizData[current];
+      questionEl.textContent = q.question;
+      optionsEl.innerHTML = "";
+      q.options.forEach(opt => {
+        const li = document.createElement("li");
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(opt);
+        li.appendChild(btn);
+        optionsEl.appendChild(li);
+      });
+    }
+
+    function checkAnswer(selected) {
+      const correct = quizData[current].answer;
+      if (selected === correct) {
+        score++;
+        resultEl.textContent = "✅ Correct!";
+        resultEl.style.color = "lightgreen";
+      } else {
+        resultEl.textContent = `❌ Wrong! Correct: ${correct}`;
+        resultEl.style.color = "red";
+      }
+      nextBtn.style.display = "inline-block";
+    }
+
+    nextBtn.addEventListener("click", () => {
+      current++;
+      if (current < quizData.length) loadQuestion();
+      else showFinal();
+    });
+
+    function showFinal() {
+      questionEl.textContent = "Quiz Completed!";
+      optionsEl.innerHTML = "";
+      nextBtn.style.display = "none";
+      resultEl.textContent = `Your Score: ${score} / ${quizData.length}`;
+      resultEl.style.color = "#ffe53b";
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>

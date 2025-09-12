@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Personal Finance - Demo</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --accent:#2563eb;
+      --muted:#6b7280;
+      --success:#16a34a;
+      --danger:#ef4444;
+      --glass: rgba(255,255,255,0.75);
+      --radius:12px;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    html,body{height:100%;margin:0;background:var(--bg);color:#0f172a;}
+    .container{
+      max-width:1100px;
+      margin:28px auto;
+      padding:22px;
+      display:grid;
+      gap:18px;
+      grid-template-columns: 1fr 380px;
+    }
+
+    header{
+      grid-column: 1 / -1;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    header h1{font-size:20px;margin:0}
+    header .sub{color:var(--muted);font-size:13px}
+
+    /* Summary cards & main */
+    .main{
+      background:linear-gradient(180deg,var(--glass), rgba(255,255,255,0.96));
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow: 0 6px 20px rgba(15,23,42,0.06);
+    }
+
+    .summary{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:10px;
+      padding:12px 14px;
+      flex:1 1 150px;
+      min-width:140px;
+      box-shadow: 0 3px 10px rgba(2,6,23,0.04);
+    }
+    .card small{display:block;color:var(--muted);font-size:12px;margin-bottom:8px}
+    .card .amount{font-weight:700;font-size:18px}
+
+    .actions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .btn{
+      background:var(--accent);
+      color:white;
+      border:none;
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    .btn.ghost{
+      background:transparent;
+      color:var(--accent);
+      border:1px solid rgba(37,99,235,0.12);
+    }
+
+    /* transactions table */
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:8px;
+      font-size:14px;
+    }
+    thead th{
+      text-align:left;padding:10px 8px;color:var(--muted);font-weight:600;border-bottom:1px solid #eef2f7;
+    }
+    tbody td{padding:10px 8px;border-bottom:1px dashed #f1f5f9}
+    .tag{
+      font-size:12px;padding:6px 8px;border-radius:999px;background:#f3f4f6;color:#111827;display:inline-block;
+    }
+
+    /* sidebar */
+    .sidebar{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow: 0 6px 20px rgba(2,6,23,0.04);
+      height:max-content;
+    }
+
+    label{display:block;font-weight:600;font-size:13px;margin-top:10px}
+    input[type="text"], input[type="number"], select, input[type="date"], textarea{
+      width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef9;margin-top:6px;font-size:14px;
+    }
+
+    .muted{color:var(--muted);font-size:13px}
+    .small{font-size:12px;color:var(--muted);margin-top:6px}
+
+    .tx-actions button{
+      background:transparent;border:0;padding:6px;cursor:pointer;color:var(--muted)
+    }
+
+    .empty{
+      text-align:center;color:var(--muted);padding:18px;border-radius:8px;background:linear-gradient(180deg, #fff, #fbfbff);
+    }
+
+    footer{grid-column:1 / -1;text-align:center;color:var(--muted);font-size:13px;margin-top:6px}
+    @media (max-width:980px){
+      .container{grid-template-columns: 1fr}
+      header{flex-direction:column;align-items:flex-start;gap:6px}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <header>
+      <div>
+        <h1>Personal Finance — Demo</h1>
+        <div class="sub">Simple local demo: transactions stored in your browser</div>
+      </div>
+      <div class="actions">
+        <button class="btn" id="exportBtn" title="Export transactions as JSON">Export</button>
+        <button class="btn ghost" id="clearBtn" title="Clear all transactions">Clear</button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main" id="main">
+      <section class="summary" aria-label="summary">
+        <div class="card">
+          <small>Balance</small>
+          <div class="amount" id="balance">₹0.00</div>
+          <div class="small muted">Available balance (income - expense)</div>
+        </div>
+
+        <div class="card">
+          <small>Total Income</small>
+          <div class="amount" id="income">₹0.00</div>
+          <div class="small muted">Sum of all income transactions</div>
+        </div>
+
+        <div class="card">
+          <small>Total Expense</small>
+          <div class="amount" id="expense">₹0.00</div>
+          <div class="small muted">Sum of all expense transactions</div>
+        </div>
+      </section>
+
+      <section aria-label="chart" style="margin-bottom:12px;">
+        <canvas id="incomeExpenseChart" height="100"></canvas>
+      </section>
+
+      <section aria-label="transactions">
+        <h3 style="margin:0 0 8px 0;font-size:16px">Transactions</h3>
+        <div id="txList">
+          <div class="empty" id="emptyMsg">No transactions yet — add one from the right panel.</div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <h3 style="margin:0 0 6px 0">Add Transaction</h3>
+
+      <form id="txForm">
+        <label for="type">Type</label>
+        <select id="type" required>
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+
+        <label for="amount">Amount (₹)</label>
+        <input id="amount" type="number" step="0.01" placeholder="e.g., 1200" required>
+
+        <label for="category">Category</label>
+<select id="category" required>
+  <option value="" disabled selected>-- Select category --</option>
+  <option value="Salary">Salary</option>
+  <option value="Freelance">Freelance</option>
+  <option value="Groceries">Groceries</option>
+  <option value="Rent">Rent</option>
+  <option value="Transport">Transport</option>
+  <option value="Utilities">Utilities</option>
+  <option value="Entertainment">Entertainment</option>
+  <option value="Health">Health</option>
+  <option value="Other">Other</option>
+</select>
+
+<!-- Hidden custom input -->
+<input id="customCategory" type="text" placeholder="Enter custom category" style="display:none;margin-top:6px;" />
+
+
+        <label for="date">Date</label>
+        <input id="date" type="date" required>
+
+        <label for="note">Note (optional)</label>
+        <textarea id="note" rows="2" placeholder="Anything to remember..."></textarea>
+
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn" type="submit">Add</button>
+          <button type="button" class="btn ghost" id="addSample">Add sample</button>
+        </div>
+      </form>
+
+      <hr style="margin:14px 0;border:none;border-top:1px solid #f0f4f9">
+
+      <h4 style="margin:0 0 6px 0">Quick actions</h4>
+      <button class="btn ghost" id="showAll">Show all</button>
+      <div class="small muted" style="margin-top:10px">Data persists in browser localStorage. Clearing will remove it.</div>
+    </aside>
+
+    <footer>
+      Demo created — transactions are stored locally in your browser's localStorage.
+    </footer>
+
+  </div>
+
+  <script>
+    // Utilities
+    const $ = (sel) => document.querySelector(sel);
+    const formatCurrency = (n) => {
+      const sign = n < 0 ? '-' : '';
+      const abs = Math.abs(Number(n) || 0);
+      // format with two decimals and thousand separators
+      return sign + '₹' + abs.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    };
+
+    // App state
+    const LS_KEY = 'demo_finance_tx_v1';
+    let transactions = [];
+
+    // Elements
+    const balanceEl = $('#balance');
+    const incomeEl = $('#income');
+    const expenseEl = $('#expense');
+    const txListEl = $('#txList');
+    const emptyMsg = $('#emptyMsg');
+    const txForm = $('#txForm');
+    const chartCanvas = $('#incomeExpenseChart');
+
+    // Load
+    function load() {
+      try{
+        const raw = localStorage.getItem(LS_KEY);
+        transactions = raw ? JSON.parse(raw) : [];
+      }catch(e){
+        transactions = [];
+      }
+      render();
+    }
+
+    function save() {
+      localStorage.setItem(LS_KEY, JSON.stringify(transactions));
+    }
+
+    // Summaries
+    function getSummary() {
+      let income = 0, expense = 0;
+      for (const t of transactions) {
+        const a = Number(t.amount) || 0;
+        if (t.type === 'income') income += a;
+        else expense += a;
+      }
+      const balance = income - expense;
+      return {income, expense, balance};
+    }
+
+    // Render transactions
+    function render() {
+      const s = getSummary();
+      balanceEl.textContent = formatCurrency(s.balance);
+      incomeEl.textContent = formatCurrency(s.income);
+      expenseEl.textContent = formatCurrency(s.expense);
+
+      // Chart
+      updateChart(s.income, s.expense);
+
+      // Transactions table
+      if (transactions.length === 0) {
+        txListEl.innerHTML = '';
+        txListEl.appendChild(emptyMsg);
+        return;
+      }
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      thead.innerHTML = `<tr>
+        <th>Date</th><th>Category</th><th>Note</th><th>Amount</th><th>Type</th><th style="text-align:right">Actions</th>
+      </tr>`;
+      table.appendChild(thead);
+
+      const tbody = document.createElement('tbody');
+
+      // sort by date desc
+      const sorted = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+      for (const tx of sorted) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${tx.date}</td>
+          <td><span class="tag">${escapeHtml(tx.category)}</span></td>
+          <td>${escapeHtml(tx.note || '')}</td>
+          <td>${tx.type === 'income' ? formatCurrency(tx.amount) : formatCurrency(-Math.abs(tx.amount))}</td>
+          <td>${tx.type}</td>
+          <td style="text-align:right" class="tx-actions">
+            <button title="Edit" data-id="${tx.id}" class="editBtn">✏</button>
+            <button title="Delete" data-id="${tx.id}" class="delBtn">🗑</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+
+      txListEl.innerHTML = '';
+      txListEl.appendChild(table);
+
+      // attach handlers
+      txListEl.querySelectorAll('.delBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.dataset.id;
+          deleteTx(id);
+        });
+      });
+      txListEl.querySelectorAll('.editBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.dataset.id;
+          startEdit(id);
+        });
+      });
+    }
+
+    // escape for simple safety in innerHTML usage
+    function escapeHtml(s){
+      if(!s) return '';
+      return s.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    // Add transaction
+    txForm.addEventListener('submit', (ev) => {
+      ev.preventDefault();
+      const type = $('#type').value;
+      const amount = Number($('#amount').value);
+      const category = $('#category').value.trim();
+      const date = $('#date').value;
+      const note = $('#note').value.trim();
+
+      if (!category || !date || !amount || amount === 0) {
+        alert('Please enter valid category, date and non-zero amount.');
+        return;
+      }
+      const tx = {
+        id: 'tx_' + Date.now() + '_' + Math.floor(Math.random()*9999),
+        type, amount: Math.abs(amount),
+        category, date, note
+      };
+      transactions.push(tx);
+      save();
+      txForm.reset();
+      // default date to today
+      $('#date').value = new Date().toISOString().slice(0,10);
+      render();
+    });
+
+    // Pre-fill date
+    $('#date').value = new Date().toISOString().slice(0,10);
+
+    // sample add
+    $('#addSample').addEventListener('click', () => {
+      const sample = {
+        id: 'tx_' + Date.now(),
+        type: ['income','expense'][Math.floor(Math.random()*2)],
+        amount: Math.floor(Math.random()*9000)+500,
+        category: ['Salary','Groceries','Utilities','Freelance','Transport'][Math.floor(Math.random()*5)],
+        date: new Date().toISOString().slice(0,10),
+        note: 'Sample transaction'
+      };
+      transactions.push(sample);
+      save();
+      render();
+    });
+
+    // delete
+    function deleteTx(id){
+      if(!confirm('Delete this transaction?')) return;
+      transactions = transactions.filter(t => t.id !== id);
+      save();
+      render();
+    }
+
+    // start edit (simple approach: populate form and remove original)
+    function startEdit(id){
+      const tx = transactions.find(t => t.id === id);
+      if(!tx) return;
+      if(!confirm('Load this transaction into the Add form for editing? (It will be removed; save again when done)')) return;
+      // populate form
+      $('#type').value = tx.type;
+      $('#amount').value = tx.amount;
+      $('#category').value = tx.category;
+      $('#date').value = tx.date;
+      $('#note').value = tx.note || '';
+      // remove
+      transactions = transactions.filter(t => t.id !== id);
+      save();
+      render();
+      // focus amount
+      $('#amount').focus();
+    }
+
+    // Export & Clear
+    $('#exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(transactions, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'transactions.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    $('#clearBtn').addEventListener('click', () => {
+      if (!confirm('This will remove all transactions permanently from this browser. Continue?')) return;
+      transactions = [];
+      save();
+      render();
+    });
+
+    // show all (scroll)
+    $('#showAll').addEventListener('click', () => {
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+
+    // Chart
+    let chartInstance = null;
+    function updateChart(income, expense) {
+      const data = [income || 0, expense || 0];
+      const labels = ['Income','Expense'];
+      if (!chartInstance) {
+        const ctx = chartCanvas.getContext('2d');
+        chartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels,
+            datasets: [{
+              data,
+              // not specifying colors — Chart.js will choose defaults
+            }]
+          },
+          options: {
+            plugins: {
+              legend: {position:'bottom'},
+              tooltip: {mode:'index'}
+            },
+            maintainAspectRatio: false,
+          }
+        });
+      } else {
+        chartInstance.data.datasets[0].data = data;
+        chartInstance.update();
+      }
+    }
+
+    // initialize
+    load();
+  </script>
+</body>
+</html>

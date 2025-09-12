@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Visualization Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f6ff;
+      color: #222;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #004080;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+    }
+    .chart-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    canvas {
+      width: 100% !important;
+      height: 300px !important;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 Data Visualization Dashboard</h1>
+
+  <div class="dashboard">
+    <div class="chart-container">
+      <h3>Sales Over Months</h3>
+      <canvas id="lineChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <h3>Revenue by Category</h3>
+      <canvas id="barChart"></canvas>
+    </div>
+    <div class="chart-container">
+      <h3>Market Share</h3>
+      <canvas id="pieChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Line Chart
+    new Chart(document.getElementById('lineChart'), {
+      type: 'line',
+      data: {
+        labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+        datasets: [{
+          label: "Sales ($)",
+          data: [1200, 1900, 3000, 2500, 3200, 4000],
+          borderColor: "#004080",
+          backgroundColor: "rgba(0, 64, 128, 0.2)",
+          tension: 0.3,
+          fill: true
+        }]
+      }
+    });
+
+    // Bar Chart
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: {
+        labels: ["Electronics", "Clothing", "Food", "Books", "Other"],
+        datasets: [{
+          label: "Revenue ($)",
+          data: [5000, 3000, 4000, 2000, 1000],
+          backgroundColor: ["#ff9800", "#4caf50", "#2196f3", "#9c27b0", "#f44336"]
+        }]
+      }
+    });
+
+    // Pie Chart
+    new Chart(document.getElementById('pieChart'), {
+      type: 'pie',
+      data: {
+        labels: ["Company A", "Company B", "Company C", "Company D"],
+        datasets: [{
+          data: [40, 25, 20, 15],
+          backgroundColor: ["#004080", "#ff9800", "#4caf50", "#9c27b0"]
+        }]
+      }
+    });
+  </script>
+
+</body>
+</html>
